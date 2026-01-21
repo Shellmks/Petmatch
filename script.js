@@ -1,8 +1,8 @@
 // ================= SUPABASE =================
 const SUPABASE_URL = "https://sowbkxqakhipmvoxhzyf.supabase.co";
-const SUPABASE_KEY = "SUA_PUBLISHABLE_ANON_KEY_AQUI";
+const SUPABASE_KEY = "SUA_ANON_KEY_AQUI";
 
-const supabaseClient = window.supabase.createClient(
+const supabaseClient = supabase.createClient(
   SUPABASE_URL,
   SUPABASE_KEY
 );
@@ -25,7 +25,12 @@ let adminLogado = false;
 
 // ================= MAGIC LINK =================
 window.enviarMagicLink = async function () {
-  const email = "sheldonmarks8@gmail.com";
+  const email = document.getElementById("email").value;
+
+  if (!email) {
+    alert("Digite o email do administrador");
+    return;
+  }
 
   const { error } = await supabaseClient.auth.signInWithOtp({
     email,
@@ -62,7 +67,12 @@ async function carregarPets() {
     .select("*")
     .order("destaque", { ascending: false });
 
-  if (!error) mostrarPets(data);
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  mostrarPets(data);
 }
 
 function mostrarPets(pets) {
