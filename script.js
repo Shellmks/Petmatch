@@ -1,63 +1,53 @@
 // ================= SUPABASE =================
 const SUPABASE_URL = "https://sowbkxqakhipmvoxhzyf.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNvd2JreHFha2hpcG12b3hoenlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgyNDcxODQsImV4cCI6MjA4MzgyMzE4NH0.TAc9wSQroF8FBY_GZjcib5h7MeB5jepCNHvL7llVZjU";
-
-const supabaseClient = supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
-);
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNvd2JreHFha2hpcG12b3hoenlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgyNDcxODQsImV4cCI6MjA4MzgyMzE4NH0.TAc9wSQroF8FBY_GZjcib5h7MeB5jepCNHvL7llVZjU";
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ================= ELEMENTOS =================
 const nome = document.getElementById("nome");
 const tipo = document.getElementById("tipo");
 const cidade = document.getElementById("cidade");
 const contato = document.getElementById("contato");
-
 const form = document.getElementById("petForm");
 const listaPets = document.getElementById("listaPets");
 const filtroTipo = document.getElementById("filtroTipo");
 const filtroCidade = document.getElementById("filtroCidade");
-
 const adminArea = document.getElementById("adminArea");
 const loginArea = document.getElementById("loginArea");
+const btnLogout = document.getElementById("btnLogout");
 
 let adminLogado = false;
+let session = null;
 
 // ================= MAGIC LINK =================
 window.enviarMagicLink = async function () {
   const email = document.getElementById("email").value;
-
-  if (!email) {
-    alert("Digite o email do administrador");
-    return;
-  }
+  if (!email) { alert("Digite o email do administrador"); return; }
 
   const { error } = await supabaseClient.auth.signInWithOtp({
     email,
-    options: {
-  emailRedirectTo: window.location.href,
-  shouldCreateUser: false
-}
+    options: { emailRedirectTo: window.location.href, shouldCreateUser: false }
   });
 
-  if (error) {
-    alert("Erro ao enviar link: " + error.message);
-  } else {
-    alert("Link enviado! Verifique seu e-mail.");
-  }
+  if (error) alert("Erro ao enviar link: " + error.message);
+  else alert("Link enviado! Verifique seu e-mail.");
 };
 
 // ================= AUTH STATE =================
-supabaseClient.auth.onAuthStateChange((_event, session) => {
-  if (session) {
-    adminLogado = true;
-    adminArea.style.display = "block";
-    loginArea.style.display = "none";
-  } else {
-    adminLogado = false;
-    adminArea.style.display = "none";
-    loginArea.style.display = "block";
-  }
+supabaseClient.auth.onAuthStateChange((_event, newSession) => {
+  session = newSession;
+  adminLogado = !!newSession;
+
+  adminArea.style.display = adminLogado ? "block" : "none";
+  loginArea.style.display = adminLogado ? "none" : "block";
+
+  if (adminLogado) carregarPets();
+});
+
+// ================= LOGOUT =================
+btnLogout.addEventListener("click", async () => {
+  await supabaseClient.auth.signOut();
+  alert("Você saiu!");
 });
 
 // ================= PETS =================
@@ -66,12 +56,7 @@ async function carregarPets() {
     .from("pets")
     .select("*")
     .order("destaque", { ascending: false });
-
-  if (error) {
-    console.error(error);
-    return;
-  }
-
+  if (error) { console.error(error); return; }
   mostrarPets(data);
 }
 
@@ -82,10 +67,7 @@ function mostrarPets(pets) {
   const c = filtroCidade.value.toLowerCase();
 
   pets
-    .filter(p =>
-      p.tipo.toLowerCase().includes(t) &&
-      p.cidade.toLowerCase().includes(c)
-    )
+    .filter(p => p.tipo.toLowerCase().includes(t) && p.cidade.toLowerCase().includes(c))
     .forEach(pet => {
       const card = document.createElement("div");
       card.className = `card ${pet.destaque ? "destaque" : ""}`;
@@ -95,7 +77,9 @@ function mostrarPets(pets) {
         <h3>${pet.nome}</h3>
         <p><strong>Tipo:</strong> ${pet.tipo}</p>
         <p><strong>Cidade:</strong> ${pet.cidade}</p>
-        ${adminLogado ? `<button onclick="removerPet(${pet.id})">Remover</button>` : ""}
+        ${adminLogado && session.user.id === pet.owner_id 
+          ? `<button onclick="removerPet(${pet.id})">Remover</button>` 
+          : ""}
       `;
 
       listaPets.appendChild(card);
@@ -107,27 +91,39 @@ form.addEventListener("submit", async e => {
   e.preventDefault();
   if (!adminLogado) return;
 
+  const user = session.user;
+
   const { error } = await supabaseClient.from("pets").insert([{
     nome: nome.value,
     tipo: tipo.value,
     cidade: cidade.value,
     contato: contato.value,
-    destaque: document.getElementById("destaque").checked
+    destaque: document.getElementById("destaque").checked,
+    owner_id: user.id
   }]);
 
-  if (!error) {
-    form.reset();
-    carregarPets();
-  }
+  if (!error) { form.reset(); carregarPets(); }
+  else alert("Erro ao adicionar pet: " + error.message);
 });
 
 window.removerPet = async function (id) {
   if (!adminLogado) return;
-  await supabaseClient.from("pets").delete().eq("id", id);
-  carregarPets();
+
+  const user = session.user;
+
+  const { error } = await supabaseClient
+    .from("pets")
+    .delete()
+    .eq("id", id)
+    .eq("owner_id", user.id);
+
+  if (error) alert("Erro ao deletar: " + error.message);
+  else carregarPets();
 };
 
-// ================= INIT =================
+// ================= FILTROS =================
 filtroTipo.addEventListener("input", carregarPets);
 filtroCidade.addEventListener("input", carregarPets);
+
+// ================= INIT =================
 carregarPets();
