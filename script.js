@@ -21,17 +21,26 @@ const filtroCidade = document.getElementById("filtroCidade");
 let adminLogado = false;
 
 // 🔹 ENVIAR MAGIC LINK
+// 🔹 ENVIAR MAGIC LINK
 async function enviarMagicLink() {
   const email = "sheldonmarks8@gmail.com";
 
   const { error } = await supabase.auth.signInWithOtp({
-    email: email,
-    options: { emailRedirectTo: window.location.href }
+    email,
+    options: {
+      emailRedirectTo: window.location.origin,
+      shouldCreateUser: false
+    }
   });
 
-  if (error) alert("Erro ao enviar link: " + error.message);
-  else alert("Link de login enviado para seu e-mail!");
+  if (error) {
+    alert("Erro ao enviar link: " + error.message);
+  } else {
+    alert("Link de login enviado! Verifique seu e-mail.");
+  }
 }
+
+
 
 // 🔹 CHECAR SESSÃO
 async function checarSessao() {
