@@ -77,16 +77,17 @@ function mostrarPets(pets) {
       const card = document.createElement("div");
       card.className = `card ${pet.destaque ? "destaque" : ""}`;
 
-     card.innerHTML = `
-  ${pet.foto_url ? `<img src="${pet.foto_url}" alt="${pet.nome}" style="width:100%; border-radius:10px; margin-bottom:10px;">` : ""}
-  ${pet.destaque ? `<span class="selo">⭐ Destaque</span>` : ""}
-  <h3>${pet.nome}</h3>
-  <p><strong>Tipo:</strong> ${pet.tipo}</p>
-  <p><strong>Cidade:</strong> ${pet.cidade}</p>
-  ${adminLogado && session.user.id === pet.owner_id 
-    ? `<button onclick="removerPet(${pet.id})">Remover</button>` 
-    : ""}
-`;
+      card.innerHTML = `
+        ${pet.foto_url ? `<img src="${pet.foto_url}" alt="${pet.nome}" style="width:100%; border-radius:10px; margin-bottom:10px;">` : ""}
+        ${pet.destaque ? `<span class="selo">⭐ Destaque</span>` : ""}
+        <h3>${pet.nome}</h3>
+        <p><strong>Tipo:</strong> ${pet.tipo}</p>
+        <p><strong>Cidade:</strong> ${pet.cidade}</p>
+        <p><strong>Contato:</strong> ${pet.contato}</p>
+        ${adminLogado && session.user.id === pet.owner_id 
+          ? `<button onclick="removerPet(${pet.id})">Remover</button>` 
+          : ""}
+      `;
 
       listaPets.appendChild(card);
     });
@@ -103,17 +104,20 @@ form.addEventListener("submit", async e => {
   // Se houver foto, faz upload
   if (fotoPet.files.length > 0) {
     const foto = fotoPet.files[0];
-    const { data, error } = await supabaseClient
+
+    // Certifique-se de que o bucket existe: pets-images
+    const { data: uploadData, error: uploadError } = await supabaseClient
       .storage
-      .from('pets-images') // bucket que você deve criar no Supabase
+      .from('pets-images')
       .upload(`public/${Date.now()}_${foto.name}`, foto, { upsert: true });
 
-    if (error) {
-      alert("Erro ao enviar foto: " + error.message);
+    if (uploadError) {
+      alert("Erro ao enviar foto: " + uploadError.message);
       return;
     }
 
-    fotoUrl = supabaseClient.storage.from('pets-images').getPublicUrl(data.path).publicUrl;
+    // Pega URL pública da imagem
+    fotoUrl = supabaseClient.storage.from('pets-images').getPublicUrl(uploadData.path).publicUrl;
   }
 
   // Inserir pet na tabela
@@ -156,4 +160,3 @@ filtroCidade.addEventListener("input", carregarPets);
 
 // ================= INIT =================
 carregarPets();
-
