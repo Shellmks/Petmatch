@@ -77,16 +77,16 @@ function mostrarPets(pets) {
       const card = document.createElement("div");
       card.className = `card ${pet.destaque ? "destaque" : ""}`;
 
-      card.innerHTML = `
-        ${pet.foto_url ? `<img src="${pet.foto_url}" alt="${pet.nome}" style="width:100%; border-radius:10px; margin-bottom:10px;">` : ""}
-        ${pet.destaque ? `<span class="selo">⭐ Destaque</span>` : ""}
-        <h3>${pet.nome}</h3>
-        <p><strong>Tipo:</strong> ${pet.tipo}</p>
-        <p><strong>Cidade:</strong> ${pet.cidade}</p>
-        ${adminLogado && session.user.id === pet.owner_id 
-          ? `<button onclick="removerPet(${pet.id})">Remover</button>` 
-          : ""}
-      `;
+     card.innerHTML = `
+  ${pet.foto_url ? `<img src="${pet.foto_url}" alt="${pet.nome}" style="width:100%; border-radius:10px; margin-bottom:10px;">` : ""}
+  ${pet.destaque ? `<span class="selo">⭐ Destaque</span>` : ""}
+  <h3>${pet.nome}</h3>
+  <p><strong>Tipo:</strong> ${pet.tipo}</p>
+  <p><strong>Cidade:</strong> ${pet.cidade}</p>
+  ${adminLogado && session.user.id === pet.owner_id 
+    ? `<button onclick="removerPet(${pet.id})">Remover</button>` 
+    : ""}
+`;
 
       listaPets.appendChild(card);
     });
@@ -156,3 +156,4 @@ filtroCidade.addEventListener("input", carregarPets);
 
 // ================= INIT =================
 carregarPets();
+
