@@ -1,65 +1,63 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PetMatch</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PetMatch</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <header>
-    <h1>🐾 PetMatch</h1>
-    <p>Divulgação paga para pets — apenas administradores podem cadastrar.</p>
+  <h1>🐾 PetMatch</h1>
+  <p>Divulgação paga para pets — apenas administradores podem cadastrar.</p>
 </header>
 
 <!-- Área Admin (só aparece quando logado) -->
 <section class="form-section" id="adminArea" style="display:none;">
-    <h2>Adicionar Pet (Admin)</h2>
-    <form id="petForm">
-        <input type="text" id="nome" placeholder="Nome do pet" required>
-        <input type="text" id="tipo" placeholder="Tipo (cachorro, gato etc)" required>
-        <input type="text" id="cidade" placeholder="Cidade" required>
-        <input type="text" id="contato" placeholder="WhatsApp (apenas números)" required>
-        <label>
-            <input type="checkbox" id="destaque">
-            Pet em destaque (pago)
-        </label>
-        <button type="submit">Adicionar</button>
-    </form>
+  <h2>Adicionar Pet (Admin)</h2>
+  <form id="petForm">
+    <input type="text" id="nome" placeholder="Nome do pet" required>
+    <input type="text" id="tipo" placeholder="Tipo (cachorro, gato etc)" required>
+    <input type="text" id="cidade" placeholder="Cidade" required>
+    <input type="text" id="contato" placeholder="WhatsApp (apenas números)" required>
+    <label>
+      <input type="checkbox" id="destaque">
+      Pet em destaque (pago)
+    </label>
+    <button type="submit">Adicionar</button>
+  </form>
+  <button id="btnLogout">Sair</button>
 </section>
 
 <!-- Filtros -->
 <section class="form-section">
-    <h2>Filtrar Pets</h2>
-    <input type="text" id="filtroTipo" placeholder="Filtrar por tipo">
-    <input type="text" id="filtroCidade" placeholder="Filtrar por cidade">
+  <h2>Filtrar Pets</h2>
+  <input type="text" id="filtroTipo" placeholder="Filtrar por tipo">
+  <input type="text" id="filtroCidade" placeholder="Filtrar por cidade">
 </section>
 
 <!-- Lista de Pets -->
 <section class="lista-section">
-    <h2>Pets</h2>
-    <div id="listaPets" class="lista"></div>
+  <h2>Pets</h2>
+  <div id="listaPets" class="lista"></div>
 </section>
 
 <!-- Login Admin -->
 <section class="form-section" id="loginArea">
-    <h2>Área do Administrador</h2>
-    <p>Digite seu e-mail para receber o link de acesso:</p>
-    <input type="email" id="email" placeholder="Email do admin">
-    <button onclick="enviarMagicLink()">Enviar link de login</button>
+  <h2>Área do Administrador</h2>
+  <p>Digite seu e-mail para receber o link de acesso:</p>
+  <input type="email" id="email" placeholder="Email do admin">
+  <button onclick="enviarMagicLink()">Enviar link de login</button>
 </section>
 
 <footer class="contato">
-    <a 
-      href="https://wa.me/5583999999999?text=Olá,%20vi%20o%20PetMatch%20e%20quero%20divulgar%20meu%20pet."
-      target="_blank">
-      📲 Falar com o PetMatch no WhatsApp
-    </a>
+  <a href="https://wa.me/5583999999999?text=Olá,%20vi%20o%20PetMatch%20e%20quero%20divulgar%20meu%20pet." target="_blank">
+    📲 Falar com o PetMatch no WhatsApp
+  </a>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="./script.js"></script>
-
+<script src="script.js"></script>
 </body>
 </html>
