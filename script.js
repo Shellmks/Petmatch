@@ -110,14 +110,14 @@ function mostrarPetsPagina() {
 
 function mostrarControles(totalPets) {
   const divControle = document.createElement("div");
-  divControle.style.textAlign = "center";
-  divControle.style.marginTop = "20px";
+  divControle.className = "pagination"; // classe pra estilizar no CSS
 
   const totalPaginas = Math.ceil(totalPets / petsPorPagina);
 
   const btnAnterior = document.createElement("button");
   btnAnterior.textContent = "⬅️ Anterior";
   btnAnterior.disabled = paginaAtual === 1;
+  btnAnterior.className = "page-btn";
   btnAnterior.onclick = () => {
     paginaAtual--;
     mostrarPetsPagina();
@@ -126,17 +126,23 @@ function mostrarControles(totalPets) {
   const btnProximo = document.createElement("button");
   btnProximo.textContent = "Próximo ➡️";
   btnProximo.disabled = paginaAtual === totalPaginas;
+  btnProximo.className = "page-btn";
   btnProximo.onclick = () => {
     paginaAtual++;
     mostrarPetsPagina();
   };
 
+  const spanPagina = document.createElement("span");
+  spanPagina.textContent = `Página ${paginaAtual} de ${totalPaginas}`;
+  spanPagina.className = "page-info";
+
   divControle.appendChild(btnAnterior);
-  divControle.appendChild(document.createTextNode(` Página ${paginaAtual} de ${totalPaginas} `));
+  divControle.appendChild(spanPagina);
   divControle.appendChild(btnProximo);
 
   listaPets.appendChild(divControle);
 }
+
 
 // ================= CRUD =================
 form.addEventListener("submit", async e => {
@@ -209,3 +215,4 @@ filtroCidade.addEventListener("input", () => { paginaAtual = 1; mostrarPetsPagin
 
 // ================= INIT =================
 carregarPets();
+
