@@ -8,10 +8,13 @@ const nome = document.getElementById("nome");
 const tipo = document.getElementById("tipo");
 const cidade = document.getElementById("cidade");
 const contato = document.getElementById("contato");
+const fotoPet = document.getElementById("fotoPet");
+
 const form = document.getElementById("petForm");
 const listaPets = document.getElementById("listaPets");
 const filtroTipo = document.getElementById("filtroTipo");
 const filtroCidade = document.getElementById("filtroCidade");
+
 const adminArea = document.getElementById("adminArea");
 const loginArea = document.getElementById("loginArea");
 const btnLogout = document.getElementById("btnLogout");
@@ -56,7 +59,9 @@ async function carregarPets() {
     .from("pets")
     .select("*")
     .order("destaque", { ascending: false });
+
   if (error) { console.error(error); return; }
+
   mostrarPets(data);
 }
 
@@ -73,6 +78,7 @@ function mostrarPets(pets) {
       card.className = `card ${pet.destaque ? "destaque" : ""}`;
 
       card.innerHTML = `
+        ${pet.foto_url ? `<img src="${pet.foto_url}" alt="${pet.nome}" style="width:100%; border-radius:10px; margin-bottom:10px;">` : ""}
         ${pet.destaque ? `<span class="selo">⭐ Destaque</span>` : ""}
         <h3>${pet.nome}</h3>
         <p><strong>Tipo:</strong> ${pet.tipo}</p>
@@ -92,18 +98,41 @@ form.addEventListener("submit", async e => {
   if (!adminLogado) return;
 
   const user = session.user;
+  let fotoUrl = null;
 
+  // Se houver foto, faz upload
+  if (fotoPet.files.length > 0) {
+    const foto = fotoPet.files[0];
+    const { data, error } = await supabaseClient
+      .storage
+      .from('pets-images') // bucket que você deve criar no Supabase
+      .upload(`public/${Date.now()}_${foto.name}`, foto, { upsert: true });
+
+    if (error) {
+      alert("Erro ao enviar foto: " + error.message);
+      return;
+    }
+
+    fotoUrl = supabaseClient.storage.from('pets-images').getPublicUrl(data.path).publicUrl;
+  }
+
+  // Inserir pet na tabela
   const { error } = await supabaseClient.from("pets").insert([{
     nome: nome.value,
     tipo: tipo.value,
     cidade: cidade.value,
     contato: contato.value,
     destaque: document.getElementById("destaque").checked,
-    owner_id: user.id
+    owner_id: user.id,
+    foto_url: fotoUrl
   }]);
 
-  if (!error) { form.reset(); carregarPets(); }
-  else alert("Erro ao adicionar pet: " + error.message);
+  if (!error) {
+    form.reset();
+    carregarPets();
+  } else {
+    alert("Erro ao adicionar pet: " + error.message);
+  }
 });
 
 window.removerPet = async function (id) {
