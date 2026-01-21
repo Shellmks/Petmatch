@@ -35,9 +35,9 @@ window.enviarMagicLink = async function () {
   const { error } = await supabaseClient.auth.signInWithOtp({
     email,
     options: {
-      emailRedirectTo: window.location.origin,
-      shouldCreateUser: false
-    }
+  emailRedirectTo: window.location.href,
+  shouldCreateUser: false
+}
   });
 
   if (error) {
@@ -131,4 +131,3 @@ window.removerPet = async function (id) {
 filtroTipo.addEventListener("input", carregarPets);
 filtroCidade.addEventListener("input", carregarPets);
 carregarPets();
-
