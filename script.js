@@ -1,6 +1,6 @@
 // ================= SUPABASE =================
 const SUPABASE_URL = "https://sowbkxqakhipmvoxhzyf.supabase.co";
-const SUPABASE_KEY = "SUA_ANON_KEY_AQUI";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNvd2JreHFha2hpcG12b3hoenlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgyNDcxODQsImV4cCI6MjA4MzgyMzE4NH0.TAc9wSQroF8FBY_GZjcib5h7MeB5jepCNHvL7llVZjU";
 
 const supabaseClient = supabase.createClient(
   SUPABASE_URL,
@@ -131,3 +131,4 @@ window.removerPet = async function (id) {
 filtroTipo.addEventListener("input", carregarPets);
 filtroCidade.addEventListener("input", carregarPets);
 carregarPets();
+
