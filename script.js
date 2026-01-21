@@ -22,6 +22,11 @@ const btnLogout = document.getElementById("btnLogout");
 let adminLogado = false;
 let session = null;
 
+// ================= PAGINAÇÃO =================
+let petsPorPagina = 20;
+let paginaAtual = 1;
+let petsCarregados = [];
+
 // ================= MAGIC LINK =================
 window.enviarMagicLink = async function () {
   const email = document.getElementById("email").value;
@@ -62,35 +67,75 @@ async function carregarPets() {
 
   if (error) { console.error(error); return; }
 
-  mostrarPets(data);
+  petsCarregados = data;
+  paginaAtual = 1;
+  mostrarPetsPagina();
 }
 
-function mostrarPets(pets) {
+function mostrarPetsPagina() {
   listaPets.innerHTML = "";
 
   const t = filtroTipo.value.toLowerCase();
   const c = filtroCidade.value.toLowerCase();
 
-  pets
-    .filter(p => p.tipo.toLowerCase().includes(t) && p.cidade.toLowerCase().includes(c))
-    .forEach(pet => {
-      const card = document.createElement("div");
-      card.className = `card ${pet.destaque ? "destaque" : ""}`;
+  const petsFiltrados = petsCarregados.filter(p => 
+    p.tipo.toLowerCase().includes(t) && p.cidade.toLowerCase().includes(c)
+  );
 
-      card.innerHTML = `
-        ${pet.foto_url ? `<img src="${pet.foto_url}" alt="${pet.nome}" style="width:100%; border-radius:10px; margin-bottom:10px;">` : ""}
-        ${pet.destaque ? `<span class="selo">⭐ Destaque</span>` : ""}
-        <h3>${pet.nome}</h3>
-        <p><strong>Tipo:</strong> ${pet.tipo}</p>
-        <p><strong>Cidade:</strong> ${pet.cidade}</p>
-        <p><strong>Contato:</strong> ${pet.contato}</p>
-        ${adminLogado && session.user.id === pet.owner_id 
-          ? `<button onclick="removerPet(${pet.id})">Remover</button>` 
-          : ""}
-      `;
+  const inicio = (paginaAtual - 1) * petsPorPagina;
+  const fim = inicio + petsPorPagina;
+  const petsPagina = petsFiltrados.slice(inicio, fim);
 
-      listaPets.appendChild(card);
-    });
+  petsPagina.forEach(pet => {
+    const card = document.createElement("div");
+    card.className = `card ${pet.destaque ? "destaque" : ""}`;
+
+    card.innerHTML = `
+      ${pet.foto_url ? `<img src="${pet.foto_url}" alt="${pet.nome}" style="width:100%; border-radius:10px; margin-bottom:10px;">` : ""}
+      ${pet.destaque ? `<span class="selo">⭐ Destaque</span>` : ""}
+      <h3>${pet.nome}</h3>
+      <p><strong>Tipo:</strong> ${pet.tipo}</p>
+      <p><strong>Cidade:</strong> ${pet.cidade}</p>
+      <p><strong>Contato:</strong> ${pet.contato}</p>
+      ${adminLogado && session.user.id === pet.owner_id 
+        ? `<button onclick="removerPet(${pet.id})">Remover</button>` 
+        : ""}
+    `;
+
+    listaPets.appendChild(card);
+  });
+
+  mostrarControles(petsFiltrados.length);
+}
+
+function mostrarControles(totalPets) {
+  const divControle = document.createElement("div");
+  divControle.style.textAlign = "center";
+  divControle.style.marginTop = "20px";
+
+  const totalPaginas = Math.ceil(totalPets / petsPorPagina);
+
+  const btnAnterior = document.createElement("button");
+  btnAnterior.textContent = "⬅️ Anterior";
+  btnAnterior.disabled = paginaAtual === 1;
+  btnAnterior.onclick = () => {
+    paginaAtual--;
+    mostrarPetsPagina();
+  };
+
+  const btnProximo = document.createElement("button");
+  btnProximo.textContent = "Próximo ➡️";
+  btnProximo.disabled = paginaAtual === totalPaginas;
+  btnProximo.onclick = () => {
+    paginaAtual++;
+    mostrarPetsPagina();
+  };
+
+  divControle.appendChild(btnAnterior);
+  divControle.appendChild(document.createTextNode(` Página ${paginaAtual} de ${totalPaginas} `));
+  divControle.appendChild(btnProximo);
+
+  listaPets.appendChild(divControle);
 }
 
 // ================= CRUD =================
@@ -101,7 +146,6 @@ form.addEventListener("submit", async e => {
   const user = session.user;
   let fotoUrl = null;
 
-  // Upload da foto (bucket pets-images)
   if (fotoPet.files.length > 0) {
     const foto = fotoPet.files[0];
     const fileName = `public/${Date.now()}_${foto.name}`;
@@ -116,7 +160,13 @@ form.addEventListener("submit", async e => {
       return;
     }
 
-    fotoUrl = supabaseClient.storage.from('pets-images').getPublicUrl(uploadData.path).publicUrl;
+    // pega a URL pública correta
+    const { data: { publicUrl } } = supabaseClient
+      .storage
+      .from('pets-images')
+      .getPublicUrl(uploadData.path);
+
+    fotoUrl = publicUrl;
   }
 
   // Inserir pet na tabela
@@ -154,8 +204,8 @@ window.removerPet = async function (id) {
 };
 
 // ================= FILTROS =================
-filtroTipo.addEventListener("input", carregarPets);
-filtroCidade.addEventListener("input", carregarPets);
+filtroTipo.addEventListener("input", () => { paginaAtual = 1; mostrarPetsPagina(); });
+filtroCidade.addEventListener("input", () => { paginaAtual = 1; mostrarPetsPagina(); });
 
 // ================= INIT =================
 carregarPets();
