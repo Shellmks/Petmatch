@@ -101,11 +101,9 @@ form.addEventListener("submit", async e => {
   const user = session.user;
   let fotoUrl = null;
 
-  // Se houver foto, faz upload
+  // Upload da foto (bucket pets-images)
   if (fotoPet.files.length > 0) {
     const foto = fotoPet.files[0];
-
-    // Certifique-se de que o bucket existe: pets-images
     const { data: uploadData, error: uploadError } = await supabaseClient
       .storage
       .from('pets-images')
@@ -116,11 +114,10 @@ form.addEventListener("submit", async e => {
       return;
     }
 
-    // Pega URL pública da imagem
     fotoUrl = supabaseClient.storage.from('pets-images').getPublicUrl(uploadData.path).publicUrl;
   }
 
-  // Inserir pet na tabela
+  // Inserir pet
   const { error } = await supabaseClient.from("pets").insert([{
     nome: nome.value,
     tipo: tipo.value,
