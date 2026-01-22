@@ -1,3 +1,32 @@
+/* ===== LOGO ===== */
+.logo-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 30px 0 20px 0;
+}
+
+.logo-container img {
+  max-width: 180px;   /* tamanho ideal */
+  width: 100%;
+  height: auto;
+  transition: transform 0.3s ease;
+}
+
+/* leve efeito ao passar o mouse */
+.logo-container img:hover {
+  transform: scale(1.05);
+}
+
+/* mobile */
+@media (max-width: 480px) {
+  .logo-container img {
+    max-width: 140px;
+  }
+}
+
+
 /* ================== RESET & BASE ================== */
 body {
   margin: 0;
@@ -180,5 +209,6 @@ button:hover {
     font-size: 16px;
     color: #333;
 }
+
 
 
