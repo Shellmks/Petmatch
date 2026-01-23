@@ -224,3 +224,4 @@ filtroCidade.addEventListener("input", () => { paginaAtual = 1; mostrarPetsPagin
 carregarPets();
 
 
+
