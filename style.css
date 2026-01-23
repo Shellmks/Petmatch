@@ -232,30 +232,22 @@ body {
   background-color: #f9fafb;
 }
 
-/* laterais com patinhas */
-@media (min-width: 900px) {
-  body::before,
-  body::after {
-    content: "🐾 🐾 🐾 🐾 🐾 🐾 🐾 🐾";
-    position: fixed;
-    top: 0;
-    width: 80px;
-    height: 100%;
-    font-size: 24px;
-    opacity: 0.08;
-    writing-mode: vertical-rl;
-    text-align: center;
-    pointer-events: none;
-  }
-
-  body::before {
-    left: 10px;
-  }
-
-  body::after {
-    right: 10px;
-  }
+.patinhas {
+  width: 100%;
+  height: 80px;
+  background-image: 
+    radial-gradient(circle at 10% 30%, rgba(0,0,0,0.08) 20%, transparent 21%),
+    radial-gradient(circle at 30% 60%, rgba(0,0,0,0.08) 20%, transparent 21%),
+    radial-gradient(circle at 55% 40%, rgba(0,0,0,0.08) 20%, transparent 21%),
+    radial-gradient(circle at 75% 70%, rgba(0,0,0,0.08) 20%, transparent 21%),
+    radial-gradient(circle at 90% 30%, rgba(0,0,0,0.08) 20%, transparent 21%);
+  
+  background-size: 60px 60px;
+  background-repeat: repeat;
+  margin-bottom: 20px;
 }
+
+
 
 
 
