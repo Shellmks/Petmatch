@@ -210,5 +210,54 @@ button:hover {
     color: #333;
 }
 
+.btn-whatsapp {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 10px 14px;
+  background: #25D366;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: bold;
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-whatsapp:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+
+body {
+  background-color: #f9fafb;
+}
+
+/* laterais com patinhas */
+@media (min-width: 900px) {
+  body::before,
+  body::after {
+    content: "🐾 🐾 🐾 🐾 🐾 🐾 🐾 🐾";
+    position: fixed;
+    top: 0;
+    width: 80px;
+    height: 100%;
+    font-size: 24px;
+    opacity: 0.08;
+    writing-mode: vertical-rl;
+    text-align: center;
+    pointer-events: none;
+  }
+
+  body::before {
+    left: 10px;
+  }
+
+  body::after {
+    right: 10px;
+  }
+}
+
+
+
 
 
