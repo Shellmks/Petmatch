@@ -96,7 +96,14 @@ function mostrarPetsPagina() {
       <h3>${pet.nome}</h3>
       <p><strong>Tipo:</strong> ${pet.tipo}</p>
       <p><strong>Cidade:</strong> ${pet.cidade}</p>
-      <p><strong>Contato:</strong> ${pet.contato}</p>
+      <a 
+  href="https://wa.me/55${pet.contato}?text=Olá!%20Vi%20seu%20pet%20no%20PetMatch%20🐾"
+  target="_blank" 
+  class="btn-whatsapp"
+>
+  💬 Falar no WhatsApp
+</a>
+
       ${adminLogado && session.user.id === pet.owner_id 
         ? `<button onclick="removerPet(${pet.id})">Remover</button>` 
         : ""}
@@ -215,4 +222,5 @@ filtroCidade.addEventListener("input", () => { paginaAtual = 1; mostrarPetsPagin
 
 // ================= INIT =================
 carregarPets();
+
 
