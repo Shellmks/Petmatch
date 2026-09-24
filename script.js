@@ -216,6 +216,7 @@ window.removerPet = async function (id) {
   else carregarPets();
 };
 
+
 // ================= FILTROS =================
 filtroTipo.addEventListener("input", () => { paginaAtual = 1; mostrarPetsPagina(); });
 filtroCidade.addEventListener("input", () => { paginaAtual = 1; mostrarPetsPagina(); });
